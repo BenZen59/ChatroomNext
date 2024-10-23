@@ -30,12 +30,18 @@ export default function Salon({ onSelectRoom }) {
     setError(""); // Réinitialiser le message d'erreur
   };
 
+  // Fonction pour sélectionner un salon
+  const selectRoom = (room) => {
+    onSelectRoom(room); // Appel de la fonction transmise depuis App
+  };
+
   return (
-    <div className="p-4">
+    <div>
       <h1 className="text-2xl font-bold mb-4 flex">
         <IoLogoWechat className="mt-1 mr-1" />
         Chat Room
       </h1>
+
       {/* Liste des salons créés */}
       <div>
         <h2 className="text-xl font-bold mb-2">Salons existants :</h2>
@@ -44,8 +50,8 @@ export default function Salon({ onSelectRoom }) {
             {rooms.map((room, index) => (
               <li key={index} className="mb-2">
                 <div
-                  className="bg-gray-200 p-2 rounded-lg w-[260px] cursor-pointer hover:bg-gray-300"
-                  onClick={() => onSelectRoom(room)} // Sélection du salon
+                  className={`bg-gray-200 p-2 rounded-lg w-[260px] cursor-pointer hover:bg-gray-300`}
+                  onClick={() => selectRoom(room)} // Sélection du salon
                 >
                   {room}
                 </div>

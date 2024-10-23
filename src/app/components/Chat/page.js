@@ -6,20 +6,34 @@ export default function Chat({ room }) {
   const [messages, setMessages] = useState([]);
   const socket = io("http://localhost:3001");
 
+  // Charger les messages du salon à partir du localStorage lorsque le salon change
   useEffect(() => {
-    socket.emit("joinRoom", room); // Rejoindre la salle sélectionnée
+    const storedMessages =
+      JSON.parse(localStorage.getItem(`messages_${room}`)) || [];
+    setMessages(storedMessages); // Charger les messages stockés pour ce salon
 
+    // Rejoindre le salon spécifiquement
+    socket.emit("joinRoom", room);
+
+    // Écouter les nouveaux messages pour le salon actuel
     socket.on("message", (msg) => {
-      setMessages((prevMessages) => [...prevMessages, msg]);
+      const updatedMessages = [...storedMessages, msg]; // Ajouter le message au salon courant
+      setMessages(updatedMessages);
+
+      // Sauvegarder les messages dans le localStorage pour ce salon
+      localStorage.setItem(`messages_${room}`, JSON.stringify(updatedMessages));
     });
 
+    // Nettoyer l'écouteur de messages et quitter la salle lors du changement de salon
     return () => {
-      socket.disconnect();
+      socket.emit("leaveRoom", room); // Quitter le salon à la déconnexion
+      socket.off("message"); // Nettoyer l'écouteur
     };
-  }, [room]);
+  }, [room]); // Dépendance au salon pour mettre à jour lors d'un changement
 
   const sendMessage = () => {
-    if (message) {
+    if (message.trim()) {
+      // Envoyer le message au serveur avec le nom du salon
       socket.emit("message", { room, message });
       setMessage("");
     }
@@ -30,7 +44,10 @@ export default function Chat({ room }) {
       <h2 className="text-xl font-bold mb-4">Salon : {room}</h2>
       <div className="mb-4 space-y-2">
         {messages.map((msg, index) => (
-          <div key={index} className="bg-gray-200 p-2 rounded-lg">
+          <div
+            key={index}
+            className="bg-black text-white w-[260px] p-2 rounded-lg"
+          >
             {msg}
           </div>
         ))}
