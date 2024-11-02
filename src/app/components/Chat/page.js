@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
+import EmojiPicker from "emoji-picker-react";
 
 export default function Chat({ room }) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+  const [showPicker, setShowPicker] = useState(false);
   const socket = io("http://localhost:3001");
 
   // Charger les messages du salon à partir du localStorage lorsque le salon change
@@ -39,6 +41,11 @@ export default function Chat({ room }) {
     }
   };
 
+  const addEmoji = (emoji) => {
+    setMessage((prevMessage) => prevMessage + emoji.native);
+    setShowPicker(false);
+  };
+
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Salon : {room}</h2>
@@ -67,6 +74,11 @@ export default function Chat({ room }) {
           Envoyer
         </button>
       </div>
+      <button className="" onClick={() => setShowPicker(!showPicker)}>
+        😊
+      </button>
+
+      {showPicker && <EmojiPicker onEmojiClick={addEmoji} />}
     </div>
   );
 }
