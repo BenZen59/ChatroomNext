@@ -42,7 +42,7 @@ export default function Chat({ room }) {
   };
 
   const addEmoji = (emoji) => {
-    setMessage((prevMessage) => prevMessage + emoji.native);
+    setMessage((prevMessage) => prevMessage + emoji.emoji);
     setShowPicker(false);
   };
 
