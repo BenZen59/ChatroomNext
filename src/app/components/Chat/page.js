@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 import EmojiPicker from "emoji-picker-react";
 
-export default function Chat({ room }) {
+export default function Chat({ room, userId }) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [showPicker, setShowPicker] = useState(false);
@@ -35,8 +35,8 @@ export default function Chat({ room }) {
 
   const sendMessage = () => {
     if (message.trim()) {
-      // Envoyer le message au serveur avec le nom du salon
-      socket.emit("message", { room, message });
+      const msgData = { room, message, senderId: userId };
+      socket.emit("message", msgData);
       setMessage("");
     }
   };
@@ -53,9 +53,13 @@ export default function Chat({ room }) {
         {messages.map((msg, index) => (
           <div
             key={index}
-            className="bg-black text-white w-[260px] p-2 rounded-lg"
+            className={`p-2 rounded-lg ${
+              msg.senderId === userId
+                ? "bg-black text-white text-right"
+                : "bg-gray-300 text-black text-left"
+            } w-[260px]`}
           >
-            {msg}
+            {msg.message}
           </div>
         ))}
       </div>
@@ -74,11 +78,9 @@ export default function Chat({ room }) {
           Envoyer
         </button>
       </div>
-      <button className="" onClick={() => setShowPicker(!showPicker)}>
-        😊
-      </button>
+      <button onClick={() => setShowPicker(!showPicker)}>😊</button>
 
-      {showPicker && <EmojiPicker onEmojiClick={addEmoji} />}
+      {showPicker && <EmojiPicker onEmojiClick={ajouterEmoji} />}
     </div>
   );
 }
